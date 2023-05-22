@@ -251,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
       fcmtoken: deviceTokenToSendPushNotification,
     });
   }
-  readFcmTokenData()async{
+
+  readFcmTokenData() async {
     Stream<DatabaseEvent> stream = ref.onValue;
     stream.listen((DatabaseEvent event) {
       print('Event Type: ${event.type}');
