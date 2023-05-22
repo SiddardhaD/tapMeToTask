@@ -228,7 +228,7 @@ class _MyHomePageState extends State<MyHomePage> {
             channelDescription: channel.description,
             // TODO add a proper drawable resource to android, for now using
             //      one that already exists in example app.
-            icon: 'launch_background',
+            icon: 'logo',
           ),
         ),
       );
@@ -251,7 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
       fcmtoken: deviceTokenToSendPushNotification,
     });
   }
-  readFcmTokenData()async{
+
+  readFcmTokenData() async {
     Stream<DatabaseEvent> stream = ref.onValue;
     stream.listen((DatabaseEvent event) {
       print('Event Type: ${event.type}');
