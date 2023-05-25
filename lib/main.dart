@@ -122,28 +122,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     getDeviceTokenToSendNotification();
     getLocation();
-    readStory();
     readFcmTokenData();
     firebaseInit();
     super.initState();
-  }
-
-  Future<String?> readStory() async {
-    Stream<DatabaseEvent> stream = ref.onValue;
-    stream.listen((DatabaseEvent event) {
-      print('Event Type: ${event.type}');
-      print('Snapshot: ${event.snapshot.value}');
-      if (event.snapshot.child(story).value != "") {
-        setState(() {
-          storyData = event.snapshot.child(story).value.toString();
-        });
-      }
-    });
-    if (storyData != null) {
-      return storyData;
-    } else {
-      return storyData;
-    }
   }
 
   getLocation() async {

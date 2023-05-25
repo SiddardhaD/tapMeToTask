@@ -24,7 +24,7 @@ String name = "BuBu";
 String partnerName = "DuDu";
 String todo = "BuBu/todo/";
 String story = "bubuStory";
-var storyData;
+String backlocation = "bubuLive";
 
 
 //dudu
@@ -38,4 +38,5 @@ var storyData;
 // String readfcmtoken = "fcmFeMale";
 // String story = "duduStory";
 // String storyData = "";
+// String backlocation = "duduLive";
 // String todo = "DuDu/todo/data";
