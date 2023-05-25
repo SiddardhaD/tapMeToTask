@@ -21,6 +21,7 @@ String lcdDisplay = "lcdFeMale";
 String fcmtoken = "fcmFeMale";
 String readfcmtoken = "fcmMale";
 String name = "BuBu";
+String todo = "BuBu/todo/";
 
 
 //dudu
@@ -31,3 +32,4 @@ String name = "BuBu";
 // String name = "DuDu";
 // String fcmtoken = "fcmMale";
 // String readfcmtoken = "fcmFeMale";
+// String todo = "DuDu/todo/data";
