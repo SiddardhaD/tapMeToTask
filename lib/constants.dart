@@ -5,7 +5,10 @@ class AppConstants {
   Color grey = Colors.grey;
   Color green = Colors.green;
   Color white = Colors.white;
+  Color black = Colors.black;
 }
+
+
 
 String fcmTokenGot = "";
 String serverKey =
@@ -24,6 +27,7 @@ String name = "BuBu";
 String partnerName = "DuDu";
 String todo = "BuBu/todo/";
 String story = "bubuStory";
+String storySend = "duduStory";
 String backlocation = "bubuLive";
 
 
@@ -38,5 +42,6 @@ String backlocation = "bubuLive";
 // String readfcmtoken = "fcmFeMale";
 // String story = "duduStory";
 // String storyData = "";
+// String storySend = "bubuStory";
 // String backlocation = "duduLive";
 // String todo = "DuDu/todo/data";

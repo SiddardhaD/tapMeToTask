@@ -388,15 +388,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
           title: Text(widget.title),
           actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileScreen()),
-                  );
-                },
-                icon: const Icon(Icons.person))
+            IconButton(onPressed: (){
+              showAlert(context);
+            }, icon: const Icon(Icons.post_add))
+            // IconButton(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => const ProfileScreen()),
+            //       );
+            //     },
+            //     icon: const Icon(Icons.person))
           ],
         ),
         body: pages[currentIndex],
@@ -439,6 +442,141 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+Future<void> showAlert(BuildContext context) async {
+  final TextEditingController txtMessage = TextEditingController();
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+            child: Container(
+          width: MediaQuery.of(context).size.width - 10,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: Colors.blue,
+                width: 3,
+              )),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+                height: MediaQuery.of(context).size.width/7,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(0),
+                      topRight: Radius.circular(0),
+                    ),
+                    border: Border.all(
+                      color: Colors.blue,
+                      width: 1,
+                    )),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Story",style: TextStyle(color: AppConstants().white),),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Icon(
+                            Icons.cancel,
+                            color: Colors.white,
+                            size: 25,
+                          ))
+                    ],
+                  ),
+                )),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: TextFormField(
+                    style: const TextStyle(height: 1, color: Colors.black),
+                    controller: txtMessage,
+                    readOnly: false,
+                    keyboardType: TextInputType.text,
+                    maxLines: 6,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(9.0),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFAAAAAA))),
+                      hintText: "Write Something here",
+                      hintStyle: TextStyle(color: AppConstants().black),
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      //contentPadding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
+                      contentPadding: const EdgeInsets.fromLTRB(12, 16, 12, 16),
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Message is required';
+                      }
+                      return null;
+                    }),
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.width/25,
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 8),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      txtMessage.clear();
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3.5,
+                      height: MediaQuery.of(context).size.width / 9,
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFD9D9D9),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFFD9D9D9),
+                            width: 1,
+                          )),
+                      child: const Center(
+                        child:
+                             Text("Cancel"),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () async {
+                      await ref.update({
+                        storySend: txtMessage.text,
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 3.5,
+                      height: MediaQuery.of(context).size.width / 9,
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFD9D9D9),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFFD9D9D9),
+                            width: 1,
+                          )),
+                      child: const Center(
+                        child: Text("Post On Top"),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ]),
+        ));
+      });
+}
+
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
@@ -482,13 +620,5 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   );
     Stream<DatabaseEvent> stream = ref.onValue;
     var data = await ref.child(story).get();
-    debugPrint("data is ${data.value}");
-    // stream.listen((DatabaseEvent event) {
-    //   print('Event Type: ${event.type}');
-    //   print('Snapshot: ${event.snapshot.value}');
-    //   if (event.snapshot.child(story).value != "") {
-    //       storyData = event.snapshot.child(story).value.toString();
-    //   }
-    // });
     return data.value.toString();
   }
