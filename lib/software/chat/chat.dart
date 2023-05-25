@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:get/get.dart';
 import 'package:tapmetoremember/apicalls/apicalls.dart';
 
@@ -35,11 +36,19 @@ class _ChatState extends State<Chat> {
       print('Snapshot: ${event.snapshot.value}');
       if (event.snapshot.child(readSms).value != "") {
         setState(() {
-          controller.messagetextfields.add(Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Text("Their :${event.snapshot.child(readSms).value}"),
+          controller.messagetextfields.add(
+              ChatBubble(
+            clipper: ChatBubbleClipper1(type: BubbleType.receiverBubble),
+            backGroundColor: Color(0xffE7E7ED),
+            margin: EdgeInsets.only(top: 20),
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.7,
+              ),
+              child: Text(
+                event.snapshot.child(readSms).value.toString(),
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ));
         });
@@ -74,6 +83,7 @@ class _ChatState extends State<Chat> {
     ApiServices().post(data, "https://fcm.googleapis.com/fcm/send", headers);
   }
 
+
   void sendMessage(String value) async {
     await ref.update({
       sendSms: value,
@@ -83,74 +93,65 @@ class _ChatState extends State<Chat> {
     });
 
     setState(() {
-      controller.messagetextfields.add(Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Text("me : $value"),
+      controller.messagetextfields.add(
+          //   Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: Align(
+          //     alignment: Alignment.topLeft,
+          //     child: Text("me : $value"),
+          //   ),
+          // )
+          ChatBubble(
+        clipper: ChatBubbleClipper1(type: BubbleType.sendBubble),
+        alignment: Alignment.topRight,
+        margin: EdgeInsets.only(top: 20),
+        backGroundColor: Colors.blue,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.7,
+          ),
+          child: Text(
+            value,
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ));
     });
     message.clear();
-    const snackdemo = SnackBar(
-      content: Text('Sent'),
-      backgroundColor: Colors.green,
-      elevation: 10,
-      behavior: SnackBarBehavior.floating,
-      margin: EdgeInsets.all(5),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackdemo);
   }
 
   Widget build(BuildContext context) {
-    return Column(
-      // mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        // Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: Text("Your token $deviceTokenToSendPushNotification"),
-        // ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: TextField(
-              controller: message,
-              obscureText: false,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                    onPressed: () {
-                      sendMessage(data);
-                      sendFcmNotification(data);
-                    },
-                    icon: const Icon(
-                      Icons.send,
-                      color: Colors.black,
-                    )),
-                labelText: 'Message',
-                hintText: 'Enter Message',
-              ),
-              onChanged: (value) {
-                setState(() {
-                  data = value;
-                });
-              },
+    return Scaffold(
+      bottomNavigationBar:  Padding(
+          padding: const EdgeInsets.only(left:15,right: 15,bottom: 15),
+          child: TextField(
+            scrollPadding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 200),
+            controller: message,
+            obscureText: false,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                  onPressed: () {
+                    sendMessage(data);
+                    sendFcmNotification(data);
+                  },
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.black,
+                  )),
+              labelText: 'Message',
+              hintText: 'Enter Message',
             ),
+            onChanged: (value) {
+              setState(() {
+                data = value;
+              });
+            },
           ),
         ),
-        // Expanded(
-        //     child: ListView.builder(
-        //         itemCount: receivedtextfields.length,
-        //         itemBuilder: (BuildContext context, int index) {
-        //           return Padding(
-        //             padding: const EdgeInsets.all(8.0),
-        //             child: Align(
-        //               alignment: Alignment.topRight,
-        //               child: receivedtextfields[index],
-        //             ),
-        //           );
-        //         })),
+      body: Column(
+      children: <Widget>[
         Expanded(
             child: ListView.builder(
                 itemCount: controller.messagetextfields.length,
@@ -158,6 +159,6 @@ class _ChatState extends State<Chat> {
                   return controller.messagetextfields[index];
                 }))
       ],
-    );
+    ),);
   }
 }

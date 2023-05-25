@@ -52,6 +52,7 @@ dependencies:
   flutter_background_service_ios: ^2.4.0
   flutter_background_service_android: ^3.0.3
   flutter_background_service_platform_interface: ^2.2.0
+  flutter_chat_bubble: ^2.0.2
 
 dev_dependencies:
   flutter_test:

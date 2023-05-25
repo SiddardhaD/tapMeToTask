@@ -54,39 +54,39 @@ class _ProfileScreenState extends State<ProfileScreen>
           controller: controller,
           image: const AssetImage("assets/bubu.gif"),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: loginController.nameController,
-            decoration: InputDecoration(
-              hintText: 'Name',
-              // suffixIcon: const Icon(Icons.email),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: loginController.partnerNameController,
-            decoration: InputDecoration(
-              hintText: 'Patner Name',
-              // suffixIcon: const Icon(Icons.email),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildCalendarDialogButton(),
-            Text(dob != "" ? dob.split(' ')[0] : "Select DOB")
-          ],
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: TextField(
+        //     controller: loginController.nameController,
+        //     decoration: InputDecoration(
+        //       hintText: 'Name',
+        //       // suffixIcon: const Icon(Icons.email),
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(20.0),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: TextField(
+        //     controller: loginController.partnerNameController,
+        //     decoration: InputDecoration(
+        //       hintText: 'Patner Name',
+        //       // suffixIcon: const Icon(Icons.email),
+        //       border: OutlineInputBorder(
+        //         borderRadius: BorderRadius.circular(20.0),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //   children: [
+        //     _buildCalendarDialogButton(),
+        //     Text(dob != "" ? dob.split(' ')[0] : "Select DOB")
+        //   ],
+        // ),
         // Padding(
         //   padding: const EdgeInsets.all(8.0),
         //   child: Row(children: [
@@ -115,12 +115,12 @@ class _ProfileScreenState extends State<ProfileScreen>
         //     },
         //   ),
         // )
-        Container(
-          child: TextButton(
-            child: const Text("Save"),
-            onPressed: () async {},
-          ),
-        )
+        // Container(
+        //   child: TextButton(
+        //     child: const Text("Save"),
+        //     onPressed: () async {},
+        //   ),
+        // )
       ]),
     );
   }

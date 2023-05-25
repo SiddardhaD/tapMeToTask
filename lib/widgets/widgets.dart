@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../constants.dart';
+import '../software/profile/profile.dart';
 import '../software/todo/todo.dart';
 
 class DrawerMenu extends StatelessWidget {
@@ -42,12 +43,16 @@ class DrawerMenu extends StatelessWidget {
         },
       ),
       ListTile(
-        leading: Icon(
-          Icons.train,
+        leading: const Icon(
+          Icons.person,
         ),
-        title: const Text('Page 2'),
+        title: const Text('Profile'),
         onTap: () {
-          Navigator.pop(context);
+          Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen()),
+                  );
         },
       ),
     ]));
