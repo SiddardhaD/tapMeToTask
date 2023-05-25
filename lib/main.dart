@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:tapmetoremember/constants.dart';
 import 'package:tapmetoremember/software/chat/chat.dart';
@@ -16,6 +20,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 import 'hardware/toLCDscreen.dart';
 import 'login/login.dart';
@@ -116,9 +121,120 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     getDeviceTokenToSendNotification();
+    getLocation();
+    readStory();
     readFcmTokenData();
     firebaseInit();
     super.initState();
+  }
+
+  Future<String?> readStory() async {
+    Stream<DatabaseEvent> stream = ref.onValue;
+    stream.listen((DatabaseEvent event) {
+      print('Event Type: ${event.type}');
+      print('Snapshot: ${event.snapshot.value}');
+      if (event.snapshot.child(story).value != "") {
+        setState(() {
+          storyData = event.snapshot.child(story).value.toString();
+        });
+      }
+    });
+    if (storyData != null) {
+      return storyData;
+    } else {
+      return storyData;
+    }
+  }
+
+  getLocation() async {
+    try {
+      var location = await determinePosition();
+      debugPrint("Location Fetced");
+      try {
+        await flutterBackgroundInit();
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+    } catch (e) {
+      debugPrint("Locarion fetcg $e");
+    }
+  }
+
+  Future<void> flutterBackgroundInit() async {
+    // final service = FlutterBackgroundService();
+    // await service.configure(
+    //   androidConfiguration: AndroidConfiguration(
+    //     onStart: onStart,
+    //     autoStart: true,
+    //     isForegroundMode: true,
+    //   ),
+    //   iosConfiguration: IosConfiguration(
+    //     autoStart: true,
+    //     onForeground: onStart,
+    //     onBackground: onIosBackground,
+    //   ),
+    // );
+    FirebaseMessaging.onMessage.listen(showFlutterNotification);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    });
+    final service = FlutterBackgroundService();
+
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        onStart: onStart,
+        autoStart: true,
+        isForegroundMode: true,
+        // notificationChannelId: 'my_foreground',
+        // initialNotificationTitle: 'AWESOME SERVICE',
+        // initialNotificationContent: 'Initializing',
+        foregroundServiceNotificationId: 888,
+      ),
+      iosConfiguration: IosConfiguration(
+        autoStart: true,
+        onForeground: onStart,
+        onBackground: onIosBackground,
+      ),
+    );
+
+    service.startService();
+  }
+
+  Future<Position> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
   }
 
   String? _token;
@@ -226,8 +342,6 @@ class _MyHomePageState extends State<MyHomePage> {
             channel.id,
             channel.name,
             channelDescription: channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
             icon: 'logo',
           ),
         ),
@@ -344,3 +458,56 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
+    });
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
+  }
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
+  
+  // bring to foreground
+  Timer.periodic(const Duration(seconds: 10), (timer) async {
+    Future<String> str = readStory();
+    if (service is AndroidServiceInstance) {
+      if (await service.isForegroundService()) {
+        service.setForegroundNotificationInfo(
+          title: partnerName,
+          content: await str,
+        );
+      }
+    }
+    debugPrint('FLUTTER BACKGROUND SERVICE IS ON');
+  });
+}
+
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
+ Future<String> readStory() async{
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+    Stream<DatabaseEvent> stream = ref.onValue;
+    var data = await ref.child(story).get();
+    debugPrint("data is ${data.value}");
+    // stream.listen((DatabaseEvent event) {
+    //   print('Event Type: ${event.type}');
+    //   print('Snapshot: ${event.snapshot.value}');
+    //   if (event.snapshot.child(story).value != "") {
+    //       storyData = event.snapshot.child(story).value.toString();
+    //   }
+    // });
+    return data.value.toString();
+  }
