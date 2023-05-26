@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:alarm/alarm.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:tapmetoremember/constants.dart';
 import 'package:tapmetoremember/software/chat/chat.dart';
 import 'package:tapmetoremember/software/notifications/notifications.dart';
-import 'package:tapmetoremember/software/profile/profile.dart';
 import 'package:tapmetoremember/software/splash.dart';
 import 'package:tapmetoremember/widgets/widgets.dart';
 import 'firebase_options.dart';
@@ -23,7 +23,6 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
 import 'hardware/toLCDscreen.dart';
-import 'login/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +30,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await Alarm.init();
   await setupFlutterNotifications();
   runApp(const MyApp());
 }
