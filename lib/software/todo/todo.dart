@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -63,13 +65,31 @@ class _ToDoScreenState extends State<ToDoScreen> {
             .split(',');
         setState(() {
           isLoading1 = false;
+          for (int i = 0; i < listtodoTime.length; i++) {
+            setAlarm(i, listtodoTime[i].trimLeft());
+          }
         });
       });
     } catch (e) {
       debugPrint("Todo Get $e");
     }
-
     super.initState();
+  }
+
+
+  setAlarm(int id, String time) async {
+    AlarmSettings alarmSettings = AlarmSettings(
+      id: id,
+      dateTime: DateTime.parse(time),
+      assetAudioPath: 'assets/alarm.mp3',
+      loopAudio: true,
+      vibrate: true,
+      fadeDuration: 3.0,
+      notificationTitle: name,
+      notificationBody: "Reminder",
+      enableNotificationOnKill: true,
+    );
+    await Alarm.set(alarmSettings: alarmSettings);
   }
 
   void _show(BuildContext ctx) {
@@ -125,8 +145,11 @@ class _ToDoScreenState extends State<ToDoScreen> {
                               )),
                         ),
                         Obx(
-                          () => Text(remindersController.timeSelected.value!="Time"?DateFormat("hh:mm aaa").format(
-                                    DateTime.parse(remindersController.timeSelected.value)):"Time"),
+                          () => Text(remindersController.timeSelected.value !=
+                                  "Time"
+                              ? DateFormat("hh:mm aaa").format(DateTime.parse(
+                                  remindersController.timeSelected.value))
+                              : "Time"),
                         )
                       ],
                     ),
